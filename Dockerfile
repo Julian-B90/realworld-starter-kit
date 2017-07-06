@@ -43,10 +43,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN composer config --global github-protocols https
 RUN composer global require "fxp/composer-asset-plugin:~1.3.1"
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer global require "fxp/composer-asset-plugin:~1.3.1"
-
 RUN mkdir -p /data/vendor
 RUN ln -sf /data/vendor /var/www/html/vendor
 
