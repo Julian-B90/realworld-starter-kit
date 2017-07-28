@@ -12,4 +12,7 @@ return  [
 
     'OPTION api/user' => 'user/option',
     'PUT api/user' => 'user/update',
+
+    'OPTION api/profiles' => 'profile/option',
+    'GET api/profiles/<username>' => 'profile/view',
 ];
