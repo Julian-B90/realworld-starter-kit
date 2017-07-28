@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\db\Expression;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "user".
@@ -21,6 +23,16 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     public $authKey;
 
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::className(),
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
     /**
      * @inheritdoc
      */
@@ -35,6 +47,9 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
+            [['username', 'email', 'password'], 'required'],
+            ['email', 'email'],
+            ['email', 'unique'],
             [['created_at', 'updated_at'], 'safe'],
             [['username', 'email', 'password', 'bio', 'image', 'token'], 'string', 'max' => 255],
         ];
@@ -82,7 +97,17 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public static function findByUsername($username)
     {
-        return static::findOne(['username' => $token]);
+        return static::findOne(['username' => $username]);
+    }
+    /**
+     * Finds user by email
+     *
+     * @param string $email
+     * @return static|null
+     */
+    public static function findByEmail($email)
+    {
+        return static::findOne(['email' => $email]);
     }
 
     /**

@@ -1,10 +1,15 @@
 <?php
 
 return  [
-  [
-      'class' => 'yii\rest\UrlRule',
-      'controller' => [
-          'user',
-      ]
-  ],
+    'OPTION api/users' => 'user/option',
+    'POST api/users' => 'user/create',
+
+    'OPTION api/users/login' => 'user/option',
+    'POST api/users/login' => 'user/login',
+
+    'OPTION api/user' => 'user/option',
+    'GET api/user' => 'user/index',
+
+    'OPTION api/user' => 'user/option',
+    'PUT api/user' => 'user/update',
 ];
