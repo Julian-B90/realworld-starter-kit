@@ -18,6 +18,9 @@ use yii\behaviors\TimestampBehavior;
  * @property string $token
  * @property string $created_at
  * @property string $updated_at
+ *
+ * @property Follow[] $follows
+ * @property Follow[] $follows0
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
@@ -143,5 +146,21 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function validatePassword($password)
     {
         return $this->password === $password;
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getFollows()
+    {
+        return $this->hasMany(Follow::className(), ['follow_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsers()
+    {
+        return $this->hasMany(Follow::className(), ['user_id' => 'id']);
     }
 }

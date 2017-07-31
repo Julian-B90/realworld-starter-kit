@@ -15,4 +15,7 @@ return  [
 
     'OPTION api/profiles' => 'profile/option',
     'GET api/profiles/<username>' => 'profile/view',
+
+    'POST api/profiles/<username>/follow' => 'profile/follow',
+    'DELETE api/profiles/<username>/follow' => 'profile/un-follow',
 ];
