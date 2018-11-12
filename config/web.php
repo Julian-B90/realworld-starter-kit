@@ -1,5 +1,7 @@
 <?php
 
+use app\components\ErrorHandler;
+
 $params = require(__DIR__ . '/params.php');
 
 $config = [
@@ -14,6 +16,9 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
+        'response' => [
+            'format' => \yii\web\Response::FORMAT_JSON,
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -21,9 +26,6 @@ $config = [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => false,
             'enableSession' => false,
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -44,10 +46,24 @@ $config = [
         'db' => require(__DIR__ . '/db.php'),
         'urlManager' => [
             'enablePrettyUrl' => true,
-            'enableStrictParsing' => true,
+            'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => require(__DIR__ . '/rules.php'),
         ],
+        'formatter' => [
+            'datetimeFormat' => 'Y-m-d\TH:i:sO',
+        ],
+        'jwt' => [
+            'class' => \sizeg\jwt\Jwt::class,
+            'key' => 'secret',
+        ],
+        'errorHandler' => [
+            'class' => ErrorHandler::class,
+            'errorAction' => '//error/index'
+        ]
+    ],
+    'modules' => [
+        'api' => ['class' => \app\modules\api\Module::class],
     ],
     'params' => $params,
 ];
@@ -58,14 +74,14 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['127.0.0.*', '172.17.0.*', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['127.0.0.*', '::1'],
     ];
 }
 

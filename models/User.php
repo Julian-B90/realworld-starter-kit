@@ -2,7 +2,9 @@
 
 namespace app\models;
 
+use app\models\query\UserQuery;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
 
@@ -12,7 +14,7 @@ use yii\behaviors\TimestampBehavior;
  * @property integer $id
  * @property string $username
  * @property string $email
- * @property string $password
+ * @property string $password_hash
  * @property string $bio
  * @property string $image
  * @property string $token
@@ -20,11 +22,16 @@ use yii\behaviors\TimestampBehavior;
  * @property string $updated_at
  *
  * @property Follow[] $follows
- * @property Follow[] $follows0
  */
 class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
-    public $authKey;
+    const TOKEN_EXPIRATION_TIMEOUT = 60 * 60 * 24 * 14;
+
+    const SCENARIO_LOGIN = 'login';
+    const SCENARIO_REGISTER = 'register';
+    const SCENARIO_UPDATE = 'update';
+
+    public $password;
 
     public function behaviors()
     {
@@ -34,6 +41,15 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
                 'value' => new Expression('NOW()'),
             ],
         ];
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
+        $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
+        $scenarios[self::SCENARIO_UPDATE] = ['username', 'email', 'password', 'image', 'bio'];
+        return $scenarios;
     }
 
     /**
@@ -50,11 +66,11 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'email', 'password'], 'required'],
+            [['username', 'email', 'password'], 'required', 'on' => self::SCENARIO_REGISTER],
+            [['email', 'password'], 'required', 'on' => self::SCENARIO_LOGIN],
             ['email', 'email'],
             ['email', 'unique'],
-            [['created_at', 'updated_at'], 'safe'],
-            [['username', 'email', 'password', 'bio', 'image', 'token'], 'string', 'max' => 255],
+            [['username', 'email', 'password', 'bio', 'image'], 'string', 'max' => 255],
         ];
     }
 
@@ -126,7 +142,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function getAuthKey()
     {
-        return $this->authKey;
+        return null;
     }
 
     /**
@@ -134,7 +150,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function validateAuthKey($authKey)
     {
-        return $this->authKey === $authKey;
+        return false;
     }
 
     /**
@@ -145,7 +161,24 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function validatePassword($password)
     {
-        return $this->password === $password;
+        return Yii::$app->security->validatePassword($password, $this->password_hash);
+    }
+
+    public function login() {
+        $this->token = $this->generateToken();
+        return $this->save();
+    }
+
+    public function register() {
+        $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
+        $this->token = $this->generateToken();
+        return $this->save();
+    }
+
+    protected function generateToken() {
+        return Yii::$app->jwt->getBuilder()
+            ->setSubject($this->id)
+            ->getToken();
     }
 
     /**
@@ -162,5 +195,10 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function getUsers()
     {
         return $this->hasMany(Follow::className(), ['user_id' => 'id']);
+    }
+
+    public static function find()
+    {
+        return new UserQuery(get_called_class());
     }
 }

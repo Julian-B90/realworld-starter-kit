@@ -1,21 +1,34 @@
 <?php
 
 return  [
-    'OPTION api/users' => 'user/option',
-    'POST api/users' => 'user/create',
-
-    'OPTION api/users/login' => 'user/option',
-    'POST api/users/login' => 'user/login',
-
-    'OPTION api/user' => 'user/option',
-    'GET api/user' => 'user/index',
-
-    'OPTION api/user' => 'user/option',
-    'PUT api/user' => 'user/update',
-
-    'OPTION api/profiles' => 'profile/option',
-    'GET api/profiles/<username>' => 'profile/view',
-
-    'POST api/profiles/<username>/follow' => 'profile/follow',
-    'DELETE api/profiles/<username>/follow' => 'profile/un-follow',
+    ['class' => \yii\rest\UrlRule::class,
+        'controller' => 'api/user',
+        'except' => ['delete', 'index'],
+        'extraPatterns' => [
+            'POST login' => 'login',
+        ]
+    ],
+    ['class' => \yii\rest\UrlRule::class,
+        'controller' => 'api/profile',
+        'only' => ['view']
+    ],
+    ['class' => \yii\rest\UrlRule::class,
+        'controller' => 'api/article',
+        'tokens' => [
+            '{slug}' => '<slug:\w+>',
+        ],
+        'patterns' => [
+            'PUT {slug}' => 'update',
+            'DELETE {slug}' => 'delete',
+            'GET,HEAD {slug}' => 'view',
+            'POST' => 'create',
+            'GET,HEAD' => 'index',
+            '{slug}' => 'options',
+            '' => 'options',
+        ]
+    ],
+    ['class' => \yii\rest\UrlRule::class,
+        'controller' => 'api/tag',
+        'only' => ['index']
+    ],
 ];

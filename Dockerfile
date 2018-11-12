@@ -1,5 +1,9 @@
 FROM php:7.1-apache
 
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/web
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
 RUN a2enmod rewrite
 
 # Packages & PHP Extensions
@@ -10,7 +14,7 @@ RUN apt-get update && \
     zlib1g-dev \
     libpq-dev \
     libfreetype6-dev \
-    libpng12-dev \
+    libpng-dev \
     libjpeg62-turbo-dev \
     git \
     gdebi --no-install-recommends \
@@ -41,7 +45,7 @@ ENV COMPOSER_ALLOW_SUPERUSER 1
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN composer config --global github-protocols https
-RUN composer global require "fxp/composer-asset-plugin:~1.3.1"
+RUN composer global require "fxp/composer-asset-plugin:^1.4.1"
 
 RUN mkdir -p /data/vendor
 RUN ln -sf /data/vendor /var/www/html/vendor
