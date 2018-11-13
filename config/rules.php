@@ -45,8 +45,8 @@ return  [
             '' => 'options',
         ],
         'extraPatterns' => [
-            'POST {slug}/favourite' => 'favourite',
-            'DELETE {slug}/favourite' => 'delete-favourite',
+            'POST {slug}/favorite' => 'favorite',
+            'DELETE {slug}/favorite' => 'delete-favorite',
         ]
     ],
 

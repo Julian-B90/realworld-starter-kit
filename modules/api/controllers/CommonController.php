@@ -18,6 +18,8 @@ class CommonController extends Controller
      * @var string|null $root - root tag for response
      */
     public $root = null;
+
+    public $displayCount = false;
     /**
      * @var bool $pluralize - if pluralize needed for index action of controller
      */
@@ -53,13 +55,28 @@ class CommonController extends Controller
     }
 
     public function addRoot($data) {
-        if ($this->action->id == 'index' && $this->pluralize) {
-            return [
-                Inflector::pluralize($this->root) => $data
-            ];
+        if (in_array($this->action->id, $this->pluralizeRootActions()) && $this->pluralize) {
+
+            $result = [];
+            $result[Inflector::pluralize($this->root)] = $data;
+
+            if ($this->displayCount) {
+                $result[Inflector::pluralize($this->root) . 'Count'] = count($data);
+            }
+            return $result;
         }
         return [
             $this->root => $data
+        ];
+    }
+
+    /**
+     * Returns array of actions, which root tags must be pluralized
+     * @return array
+     */
+    protected function pluralizeRootActions() {
+        return [
+            'index'
         ];
     }
 

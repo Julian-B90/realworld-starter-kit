@@ -4,7 +4,7 @@
 namespace app\modules\api\models;
 
 
-use app\models\Favourite;
+use app\models\Favorite;
 use yii\data\ArrayDataProvider;
 use yii\db\Query;
 

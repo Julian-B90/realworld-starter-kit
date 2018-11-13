@@ -26,7 +26,7 @@ use yii\web\UnauthorizedHttpException;
  * @property ArticleTag[] $articleTags
  * @property Tag[] $tags
  * @property Comment[] $comments
- * @property Favourite[] $favourites
+ * @property Favorite[] $favorites
  * @property boolean $favorited
  */
 class Article extends ActiveRecord
@@ -66,7 +66,6 @@ class Article extends ActiveRecord
             [['body'], 'string'],
             [['title', 'description'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
-            ['slug', 'unique']
         ];
     }
 
@@ -93,6 +92,7 @@ class Article extends ActiveRecord
             [
                 'class' => SluggableBehavior::class,
                 'attribute' => 'title',
+                'ensureUnique' => true
             ],
             [
                 'class' => BlameableBehavior::class,
@@ -141,9 +141,9 @@ class Article extends ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getFavourites()
+    public function getFavorites()
     {
-        return $this->hasMany(Favourite::className(), ['article_id' => 'id']);
+        return $this->hasMany(Favorite::className(), ['article_id' => 'id']);
     }
 
     /**
@@ -153,20 +153,23 @@ class Article extends ActiveRecord
         if (Yii::$app->user->isGuest) {
             return false;
         }
-        return $this->getFavourites()->andWhere(['user_id' => Yii::$app->user->id])->exists();
+        return $this->getFavorites()->andWhere(['user_id' => Yii::$app->user->id])->exists();
     }
 
-    public function setFavouritesCount($value) {
+    public function setFavoritesCount($value) {
         $this->_favoritesCount = intval($value);
     }
 
-    public function getFavouritesCount() {
-        return $this->_favoritesCount;
+    public function getFavoritesCount() {
+        $count = !is_null($this->_favoritesCount)
+            ? $this->_favoritesCount
+            : $this->getFavorites()->count();
+        return intval($count);
     }
 
     public static function find()
     {
-        return (new ArticleQuery(get_called_class()))->withFavouritesCount();
+        return (new ArticleQuery(get_called_class()))->withFavoritesCount();
     }
 
     public static function findBySlug($slug) {
@@ -190,19 +193,19 @@ class Article extends ActiveRecord
      * @return bool
      * @throws UnauthorizedHttpException
      */
-    public function setFavourite($userId = null) {
+    public function setFavorite($userId = null) {
         $userId = $userId ?: Yii::$app->user->id;
 
         if (is_null($userId)) {
-            throw new UnauthorizedHttpException('You must login to set favourite');
+            throw new UnauthorizedHttpException('You must login to set favorite');
         }
 
-        $favourite = new Favourite([
+        $favorite = new Favorite([
             'user_id' => $userId,
             'article_id' => $this->id,
         ]);
 
-        return $favourite->save();
+        return $favorite->save();
     }
 
     /**
@@ -210,13 +213,13 @@ class Article extends ActiveRecord
      *
      * @throws UnauthorizedHttpException
      */
-    public function deleteFavourite($userId = null) {
+    public function deleteFavorite($userId = null) {
         $userId = $userId ?: Yii::$app->user->id;
 
         if (is_null($userId)) {
-            throw new UnauthorizedHttpException('You must login to set favourite');
+            throw new UnauthorizedHttpException('You must login to set favorite');
         }
 
-        Favourite::deleteAll(['article_id' => $this->id, 'user_id' => $userId]);
+        Favorite::deleteAll(['article_id' => $this->id, 'user_id' => $userId]);
     }
 }

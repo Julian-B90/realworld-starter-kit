@@ -1,11 +1,5 @@
 <?php
 
-
-putenv("MYSQL_HOST=127.0.0.1");
-putenv("MYSQL_DB=conduit");
-putenv("MYSQL_USER=root");
-putenv("MYSQL_PASSWORD=qwerty");
-
 // comment out the following two lines when deployed to production
 defined('YII_DEBUG') or define('YII_DEBUG', true);
 defined('YII_ENV') or define('YII_ENV', 'dev');

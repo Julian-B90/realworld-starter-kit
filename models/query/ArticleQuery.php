@@ -20,18 +20,18 @@ class ArticleQuery extends \yii\db\ActiveQuery
     }
 
     /**
-     * Add favouritesCount value to find query result
+     * Add favoritesCount value to find query result
      * @return ArticleQuery
      */
-    public function withFavouritesCount() {
+    public function withFavoritesCount() {
         return $this
-            ->addSelect(['favouritesCount' => 'ifnull(favourites.favouritesCount, 0)'])
+            ->addSelect(['favoritesCount' => 'ifnull(favorites.favoritesCount, 0)'])
             ->leftJoin([
-                'favourites' => (new Query())
-                    ->select(['favourite.article_id', 'favouritesCount' => 'count(*)'])
-                    ->from('favourite')
-                    ->groupBy('favourite.article_id')
+                'favorites' => (new Query())
+                    ->select(['favorite.article_id', 'favoritesCount' => 'count(*)'])
+                    ->from('favorite')
+                    ->groupBy('favorite.article_id')
 
-            ],'article.id = favourites.article_id');
+            ],'article.id = favorites.article_id');
     }
 }

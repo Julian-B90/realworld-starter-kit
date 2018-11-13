@@ -26,7 +26,7 @@ class Article extends \app\models\Article
                 return \Yii::$app->formatter->asDatetime($model->updated_at);
             },
             'favorited',
-            'favouritesCount',
+            'favoritesCount',
             'author',
         ];
     }

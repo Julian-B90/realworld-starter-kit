@@ -52,7 +52,7 @@ $config = [
             'rules' => require(__DIR__ . '/rules.php'),
         ],
         'formatter' => [
-            'datetimeFormat' => 'Y-m-d\TH:i:sO',
+            'datetimeFormat' => 'php:Y-m-d\TH:i:s.000\Z',
         ],
         'jwt' => [
             'class' => \sizeg\jwt\Jwt::class,

@@ -11,6 +11,8 @@ use yii\web\NotFoundHttpException;
 class ProfileController extends CommonController
 {
 
+    public $root = 'profile';
+
     public function actions()
     {
         return [];

@@ -30,7 +30,7 @@ class UserQuery extends \yii\db\ActiveQuery
      */
 
     /**
-     * Add favouritesCount value to find query result
+     * Add favoritesCount value to find query result
      * @param int $userId
      * @return UserQuery
      */

@@ -20,6 +20,7 @@ use yii\web\ServerErrorHttpException;
 class ArticleController extends CommonController
 {
     public $root = 'article';
+    public $displayCount = true;
 
     public function behaviors()
     {
@@ -29,6 +30,13 @@ class ArticleController extends CommonController
             'view',
         ];
         return $behaviors;
+    }
+
+    protected function pluralizeRootActions()
+    {
+        return array_merge(parent::pluralizeRootActions(), [
+           'feed'
+        ]);
     }
 
     /**
@@ -151,10 +159,10 @@ class ArticleController extends CommonController
      * @throws NotFoundHttpException
      * @throws \yii\web\UnauthorizedHttpException
      */
-    public function actionFavourite($slug) {
+    public function actionFavorite($slug) {
         $model = $this->findModel($slug);
-        $model->setFavourite();
-        return $model;
+        $model->setFavorite();
+        return $this->findModel($slug);
     }
 
     /**
@@ -163,10 +171,10 @@ class ArticleController extends CommonController
      * @throws NotFoundHttpException
      * @throws \yii\web\UnauthorizedHttpException
      */
-    public function actionDeleteFavourite($slug) {
+    public function actionDeleteFavorite($slug) {
         $model = $this->findModel($slug);
-        $model->deleteFavourite();
-        return $model;
+        $model->deleteFavorite();
+        return $this->findModel($slug);
     }
 
     /**

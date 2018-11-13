@@ -6,7 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "favourite".
+ * This is the model class for table "favorite".
  *
  * @property int $id
  * @property int $user_id
@@ -17,14 +17,14 @@ use yii\behaviors\TimestampBehavior;
  * @property Article $article
  * @property User $user
  */
-class Favourite extends \yii\db\ActiveRecord
+class Favorite extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'favourite';
+        return 'favorite';
     }
 
     public function behaviors()

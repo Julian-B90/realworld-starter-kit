@@ -4,7 +4,7 @@
 namespace app\modules\api\models;
 
 
-use app\models\Favourite;
+use app\models\Favorite;
 use yii\data\ArrayDataProvider;
 use yii\db\Query;
 
@@ -49,7 +49,7 @@ class ArticleSearch extends Article
 
         if (!is_null($this->favourited)) {
             $query->innerJoin([
-                'favourited' => Favourite::find()
+                'favourited' => Favorite::find()
                     ->select(['article_id'])
                     ->innerJoin('user', 'favourite.user_id = user.id')
                     ->andWhere(['user.username' => $this->favourited])

@@ -9,14 +9,14 @@ use yii\db\Migration;
  * - `user`
  * - `article`
  */
-class m180927_200050_create_favourite_table extends Migration
+class m180927_200050_create_favorite_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->createTable('favourite', [
+        $this->createTable('favorite', [
             'id' => $this->primaryKey(),
             'user_id' => $this->integer()->notNull(),
             'article_id' => $this->integer()->notNull(),
@@ -26,15 +26,15 @@ class m180927_200050_create_favourite_table extends Migration
 
         // creates index for column `user_id`
         $this->createIndex(
-            'idx-favourite-user_id',
-            'favourite',
+            'idx-favorite-user_id',
+            'favorite',
             'user_id'
         );
 
         // add foreign key for table `user`
         $this->addForeignKey(
-            'fk-favourite-user_id',
-            'favourite',
+            'fk-favorite-user_id',
+            'favorite',
             'user_id',
             'user',
             'id',
@@ -43,15 +43,15 @@ class m180927_200050_create_favourite_table extends Migration
 
         // creates index for column `article_id`
         $this->createIndex(
-            'idx-favourite-article_id',
-            'favourite',
+            'idx-favorite-article_id',
+            'favorite',
             'article_id'
         );
 
         // add foreign key for table `article`
         $this->addForeignKey(
-            'fk-favourite-article_id',
-            'favourite',
+            'fk-favorite-article_id',
+            'favorite',
             'article_id',
             'article',
             'id',
@@ -66,28 +66,28 @@ class m180927_200050_create_favourite_table extends Migration
     {
         // drops foreign key for table `user`
         $this->dropForeignKey(
-            'fk-favourite-user_id',
-            'favourite'
+            'fk-favorite-user_id',
+            'favorite'
         );
 
         // drops index for column `user_id`
         $this->dropIndex(
-            'idx-favourite-user_id',
-            'favourite'
+            'idx-favorite-user_id',
+            'favorite'
         );
 
         // drops foreign key for table `article`
         $this->dropForeignKey(
-            'fk-favourite-article_id',
-            'favourite'
+            'fk-favorite-article_id',
+            'favorite'
         );
 
         // drops index for column `article_id`
         $this->dropIndex(
-            'idx-favourite-article_id',
-            'favourite'
+            'idx-favorite-article_id',
+            'favorite'
         );
 
-        $this->dropTable('favourite');
+        $this->dropTable('favorite');
     }
 }
