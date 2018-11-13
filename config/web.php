@@ -1,6 +1,7 @@
 <?php
 
 use app\components\ErrorHandler;
+use app\modules\api\models\User;
 
 $params = require(__DIR__ . '/params.php');
 
@@ -23,7 +24,7 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => User::class,
             'enableAutoLogin' => false,
             'enableSession' => false,
         ],
@@ -56,6 +57,9 @@ $config = [
         'jwt' => [
             'class' => \sizeg\jwt\Jwt::class,
             'key' => 'secret',
+            'supportedAlgs' => [
+                'HS256' => 'Lcobucci\JWT\Signer\Hmac\Sha256',
+            ]
         ],
         'errorHandler' => [
             'class' => ErrorHandler::class,

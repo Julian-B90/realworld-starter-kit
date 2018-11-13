@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "favourite".
@@ -26,13 +27,20 @@ class Favourite extends \yii\db\ActiveRecord
         return 'favourite';
     }
 
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            TimestampBehavior::class,
+        ]);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['user_id', 'article_id', 'created_at', 'updated_at'], 'required'],
+            [['user_id', 'article_id'], 'required'],
             [['user_id', 'article_id', 'created_at', 'updated_at'], 'integer'],
             [['article_id'], 'exist', 'skipOnError' => true, 'targetClass' => Article::className(), 'targetAttribute' => ['article_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],

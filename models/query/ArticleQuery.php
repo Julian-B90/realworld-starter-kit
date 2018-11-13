@@ -25,7 +25,7 @@ class ArticleQuery extends \yii\db\ActiveQuery
      */
     public function withFavouritesCount() {
         return $this
-            ->addSelect(['following' => 'ifnull(favourites.favouritesCount, 0)'])
+            ->addSelect(['favouritesCount' => 'ifnull(favourites.favouritesCount, 0)'])
             ->leftJoin([
                 'favourites' => (new Query())
                     ->select(['favourite.article_id', 'favouritesCount' => 'count(*)'])

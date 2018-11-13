@@ -8,8 +8,9 @@ use sizeg\jwt\JwtHttpBearerAuth;
 use yii\base\Model;
 use yii\helpers\Inflector;
 use yii\rest\ActiveController;
+use yii\rest\Controller;
 
-class CommonController extends ActiveController
+class CommonController extends Controller
 {
     const AUTHENTICATOR_BEHAVIOR = 'authenticator';
 
@@ -45,7 +46,7 @@ class CommonController extends ActiveController
         }
         $serializedData = $this->serializeData($result);
 
-        if ($this->root) {
+        if (!is_null($serializedData) && $this->root) {
             $serializedData = $this->addRoot($serializedData);
         }
         return $serializedData;

@@ -3,8 +3,10 @@
 namespace app\models;
 
 use app\models\query\UserQuery;
+use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\db\Expression;
 use yii\behaviors\TimestampBehavior;
 
@@ -27,7 +29,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
 {
     const TOKEN_EXPIRATION_TIMEOUT = 60 * 60 * 24 * 14;
 
-    const SCENARIO_LOGIN = 'login';
     const SCENARIO_REGISTER = 'register';
     const SCENARIO_UPDATE = 'update';
 
@@ -46,7 +47,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios[self::SCENARIO_LOGIN] = ['email', 'password'];
         $scenarios[self::SCENARIO_REGISTER] = ['username', 'email', 'password'];
         $scenarios[self::SCENARIO_UPDATE] = ['username', 'email', 'password', 'image', 'bio'];
         return $scenarios;
@@ -67,7 +67,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
         return [
             [['username', 'email', 'password'], 'required', 'on' => self::SCENARIO_REGISTER],
-            [['email', 'password'], 'required', 'on' => self::SCENARIO_LOGIN],
             ['email', 'email'],
             ['email', 'unique'],
             [['username', 'email', 'password', 'bio', 'image'], 'string', 'max' => 255],
@@ -169,16 +168,33 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return $this->save();
     }
 
+    /**
+     * @return bool
+     * @throws \yii\base\Exception
+     */
     public function register() {
         $this->password_hash = Yii::$app->security->generatePasswordHash($this->password);
         $this->token = $this->generateToken();
         return $this->save();
     }
 
+    /**
+     * @return string
+     * @throws InvalidConfigException
+     */
     protected function generateToken() {
-        return Yii::$app->jwt->getBuilder()
-            ->setSubject($this->id)
+        $signer = new Sha256();
+
+        if (!isset(\Yii::$app->jwt)) {
+            throw new InvalidConfigException('You must setup JWT component');
+        }
+
+        $token = \Yii::$app->jwt->getBuilder()
+            ->setExpiration(time() + self::TOKEN_EXPIRATION_TIMEOUT)
+            ->set('user_id', $this->id)
+            ->sign($signer, \Yii::$app->jwt->key)
             ->getToken();
+        return strval($token);
     }
 
     /**
@@ -186,7 +202,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function getFollows()
     {
-        return $this->hasMany(Follow::className(), ['follow_id' => 'id']);
+        return $this->hasMany(Follow::class, ['follow_id' => 'id']);
     }
 
     /**
@@ -194,7 +210,41 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function getUsers()
     {
-        return $this->hasMany(Follow::className(), ['user_id' => 'id']);
+        return $this->hasMany(Follow::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * @param User $user
+     */
+    public function follow($user) {
+        $isAlreadyFollowing = Follow::find()
+            ->andWhere(['follower_id' => $this->id, 'followed_id' => $user->id])
+            ->exists();
+        if ($isAlreadyFollowing) {
+            return true;
+        }
+
+        $follow = new Follow([
+            'follower_id' => $this->id,
+            'followed_id' => $user->id,
+        ]);
+
+        return $follow->save();
+    }
+
+    /**
+     * @param $user
+     *
+     * @return false|int
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
+     */
+    public function unfollow($user) {
+        $follow = Follow::findOne(['follower_id' => $this->id, 'followed_id' => $user->id]);
+        if (is_null($follow)) {
+            return true;
+        }
+        return $follow->delete();
     }
 
     public static function find()

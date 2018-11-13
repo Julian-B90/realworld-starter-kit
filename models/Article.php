@@ -8,6 +8,7 @@ use yii\behaviors\BlameableBehavior;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
+use yii\web\UnauthorizedHttpException;
 
 /**
  * This is the model class for table "article".
@@ -30,6 +31,8 @@ use yii\db\ActiveRecord;
  */
 class Article extends ActiveRecord
 {
+    const SCENARIO_UPDATE = 'update';
+
     private $_favoritesCount;
 
     /**
@@ -38,6 +41,14 @@ class Article extends ActiveRecord
     public static function tableName()
     {
         return 'article';
+    }
+
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios[self::SCENARIO_UPDATE] = ['title', 'description', 'body'];
+
+        return $scenarios;
     }
 
     /**
@@ -55,6 +66,7 @@ class Article extends ActiveRecord
             [['body'], 'string'],
             [['title', 'description'], 'string', 'max' => 255],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            ['slug', 'unique']
         ];
     }
 
@@ -98,7 +110,7 @@ class Article extends ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
     /**
@@ -106,7 +118,7 @@ class Article extends ActiveRecord
      */
     public function getArticleTags()
     {
-        return $this->hasMany(ArticleTag::className(), ['article_id' => 'id']);
+        return $this->hasMany(ArticleTag::class, ['article_id' => 'id']);
     }
 
     /**
@@ -114,7 +126,8 @@ class Article extends ActiveRecord
      */
     public function getTags()
     {
-        return $this->hasMany(Tag::className(), ['id' => 'tag_id'])->viaTable('article_tag', ['article_id' => 'id']);
+        return $this->hasMany(Tag::class, ['id' => 'tag_id'])
+            ->viaTable('article_tag', ['article_id' => 'id']);
     }
 
     /**
@@ -144,7 +157,7 @@ class Article extends ActiveRecord
     }
 
     public function setFavouritesCount($value) {
-        $this->_favoritesCount = $value;
+        $this->_favoritesCount = intval($value);
     }
 
     public function getFavouritesCount() {
@@ -158,5 +171,52 @@ class Article extends ActiveRecord
 
     public static function findBySlug($slug) {
         return self::find()->andWhere(['slug' => $slug])->one();
+    }
+
+    /**
+     * @param Comment $comment
+     *
+     * @return Comment
+     */
+    public function addComment($comment) {
+        $comment->article_id = $this->id;
+        $comment->save();
+        return $comment;
+    }
+
+    /**
+     * @param null $userId
+     *
+     * @return bool
+     * @throws UnauthorizedHttpException
+     */
+    public function setFavourite($userId = null) {
+        $userId = $userId ?: Yii::$app->user->id;
+
+        if (is_null($userId)) {
+            throw new UnauthorizedHttpException('You must login to set favourite');
+        }
+
+        $favourite = new Favourite([
+            'user_id' => $userId,
+            'article_id' => $this->id,
+        ]);
+
+        return $favourite->save();
+    }
+
+    /**
+     * @param null $userId
+     *
+     * @throws UnauthorizedHttpException
+     */
+    public function deleteFavourite($userId = null) {
+        $userId = $userId ?: Yii::$app->user->id;
+
+        if (is_null($userId)) {
+            throw new UnauthorizedHttpException('You must login to set favourite');
+        }
+
+        Favourite::deleteAll(['article_id' => $this->id, 'user_id' => $userId]);
     }
 }

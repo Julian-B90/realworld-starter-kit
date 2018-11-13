@@ -16,4 +16,9 @@ class User extends \app\models\User
             'image',
         ];
     }
+
+    public function formName()
+    {
+        return 'user';
+    }
 }

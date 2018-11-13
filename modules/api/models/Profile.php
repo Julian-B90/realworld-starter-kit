@@ -5,6 +5,7 @@ namespace app\modules\api\models;
 
 
 use app\models\User;
+use yii\web\NotFoundHttpException;
 
 class Profile extends User
 {
@@ -16,7 +17,9 @@ class Profile extends User
             'username',
             'bio',
             'image',
-            'following'
+            'following' => function (self $model) {
+                return boolval($model->following);
+            }
         ];
     }
 
@@ -26,6 +29,7 @@ class Profile extends User
         if (!\Yii::$app->user->isGuest) {
             $query = $query->withFollowing(\Yii::$app->user->id);
         }
+
         return $query;
     }
 }

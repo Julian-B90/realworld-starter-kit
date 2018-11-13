@@ -5,6 +5,8 @@ namespace app\modules\api\controllers;
 use app\modules\api\models\LoginUserParams;
 use app\modules\api\models\RegisterUserParams;
 use app\modules\api\models\User;
+use app\modules\api\Module;
+use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\web\HttpException;
@@ -22,7 +24,8 @@ class UserController extends CommonController
             $actions['index'],
             $actions['delete'],
             $actions['create'],
-            $actions['view']
+            $actions['view'],
+            $actions['update']
         );
         return $actions;
     }
@@ -49,7 +52,6 @@ class UserController extends CommonController
         }
 
         $user = User::findByEmail($params->email);
-        $user->setScenario(User::SCENARIO_LOGIN);
 
         if (is_null($user) || !$user->validatePassword($params->password)) {
             throw new HttpException(422, 'Email or password are incorrect');
@@ -63,7 +65,7 @@ class UserController extends CommonController
 
     /**
      * @return RegisterUserParams|User
-     * @throws InvalidConfigException
+     * @throws InvalidConfigException|Exception
      */
     public function actionCreate() {
         $params = new RegisterUserParams();
@@ -86,6 +88,22 @@ class UserController extends CommonController
     }
 
     public function actionView() {
-        return \Yii::$app->user->identity;
+        return Module::getInstance()->user->identity;
+    }
+
+    /**
+     * @return User
+     * @throws InvalidConfigException
+     */
+    public function actionUpdate() {
+        /** @var User $user */
+        $user = Module::getInstance()->user->identity;
+        $user->setScenario(User::SCENARIO_UPDATE);
+        $user->load(\Yii::$app->request->getBodyParams());
+        if ($user->validate()) {
+            $user->save();
+            $user->refresh();
+        }
+        return $user;
     }
 }

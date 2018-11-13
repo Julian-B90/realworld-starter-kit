@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * This is the model class for table "follow".
@@ -26,13 +27,20 @@ class Follow extends \yii\db\ActiveRecord
         return 'follow';
     }
 
+    public function behaviors()
+    {
+        return array_merge(parent::behaviors(), [
+            ['class' => TimestampBehavior::class,]
+        ]);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['follower_id', 'followed_id', 'created_at', 'updated_at'], 'required'],
+            [['follower_id', 'followed_id'], 'required'],
             [['follower_id', 'followed_id', 'created_at', 'updated_at'], 'integer'],
             [['followed_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['followed_id' => 'id']],
             [['follower_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['follower_id' => 'id']],

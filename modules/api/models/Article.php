@@ -34,4 +34,17 @@ class Article extends \app\models\Article
     public function getAuthor() {
         return $this->hasOne(Profile::class, ['id' => 'user_id']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getComments()
+    {
+        return $this->hasMany(Comment::class, ['article_id' => 'id']);
+    }
+
+    public function formName()
+    {
+        return 'article';
+    }
 }
