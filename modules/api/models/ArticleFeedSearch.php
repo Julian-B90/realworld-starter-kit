@@ -34,7 +34,7 @@ class ArticleFeedSearch extends Article
         if (!is_null($userId)) {
             $query->innerJoin('user', 'article.user_id = user.id')
                 ->innerJoin('follow', 'user.id = follow.followed_id')
-                ->andWhere(['follow.follower_id' => $userId]);
+                ->where(['follow.follower_id' => $userId]);
         }
 
         return $query;

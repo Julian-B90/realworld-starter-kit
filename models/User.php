@@ -218,7 +218,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public function follow($user) {
         $isAlreadyFollowing = Follow::find()
-            ->andWhere(['follower_id' => $this->id, 'followed_id' => $user->id])
+            ->where(['follower_id' => $this->id, 'followed_id' => $user->id])
             ->exists();
         if ($isAlreadyFollowing) {
             return true;

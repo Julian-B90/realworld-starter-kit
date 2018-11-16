@@ -25,10 +25,10 @@ class ArticleQuery extends \yii\db\ActiveQuery
      */
     public function withFavoritesCount() {
         return $this
-            ->addSelect(['favoritesCount' => 'ifnull(favorites.favoritesCount, 0)'])
+            ->addSelect(['favoritesCount' => 'IFNULL(favorites.favoritesCount, 0)'])
             ->leftJoin([
                 'favorites' => (new Query())
-                    ->select(['favorite.article_id', 'favoritesCount' => 'count(*)'])
+                    ->select(['favorite.article_id', 'favoritesCount' => 'COUNT(*)'])
                     ->from('favorite')
                     ->groupBy('favorite.article_id')
 

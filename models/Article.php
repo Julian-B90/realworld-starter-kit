@@ -153,7 +153,7 @@ class Article extends ActiveRecord
         if (Yii::$app->user->isGuest) {
             return false;
         }
-        return $this->getFavorites()->andWhere(['user_id' => Yii::$app->user->id])->exists();
+        return $this->getFavorites()->where(['user_id' => Yii::$app->user->id])->exists();
     }
 
     public function setFavoritesCount($value) {
@@ -173,7 +173,7 @@ class Article extends ActiveRecord
     }
 
     public static function findBySlug($slug) {
-        return self::find()->andWhere(['slug' => $slug])->one();
+        return self::find()->where(['slug' => $slug])->one();
     }
 
     /**

@@ -37,14 +37,14 @@ class ArticleSearch extends Article
             $query->innerJoin([
                 'authors' => User::find()
                     ->select(['author_id' => 'id'])
-                    ->andWhere(['user.username' => $this->author])
+                    ->where(['user.username' => $this->author])
             ], 'authors.author_id = article.user_id');
         }
 
         if (!is_null($this->tag)) {
             $query->innerJoin('article_tag', 'article_tag.article_id = article.id')
                 ->innerJoin('tag', 'article_tag.tag_id = tag.id')
-                ->andWhere(['tag.name' => $this->tag]);
+                ->where(['tag.name' => $this->tag]);
         }
 
         if (!is_null($this->favourited)) {
@@ -52,7 +52,7 @@ class ArticleSearch extends Article
                 'favourited' => Favorite::find()
                     ->select(['article_id'])
                     ->innerJoin('user', 'favourite.user_id = user.id')
-                    ->andWhere(['user.username' => $this->favourited])
+                    ->where(['user.username' => $this->favourited])
             ], 'favourited.article_id = article.id');
         }
 
