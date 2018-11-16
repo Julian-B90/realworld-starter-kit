@@ -42,8 +42,8 @@ class Follow extends \yii\db\ActiveRecord
         return [
             [['follower_id', 'followed_id'], 'required'],
             [['follower_id', 'followed_id', 'created_at', 'updated_at'], 'integer'],
-            [['followed_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['followed_id' => 'id']],
-            [['follower_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['follower_id' => 'id']],
+            [['followed_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['followed_id' => 'id']],
+            [['follower_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['follower_id' => 'id']],
         ];
     }
 
@@ -66,7 +66,7 @@ class Follow extends \yii\db\ActiveRecord
      */
     public function getFollowed()
     {
-        return $this->hasOne(User::className(), ['id' => 'followed_id']);
+        return $this->hasOne(User::class, ['id' => 'followed_id']);
     }
 
     /**
@@ -74,6 +74,6 @@ class Follow extends \yii\db\ActiveRecord
      */
     public function getFollower()
     {
-        return $this->hasOne(User::className(), ['id' => 'follower_id']);
+        return $this->hasOne(User::class, ['id' => 'follower_id']);
     }
 }

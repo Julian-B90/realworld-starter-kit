@@ -65,7 +65,7 @@ class Article extends ActiveRecord
             [['user_id', 'created_at', 'updated_at'], 'integer'],
             [['body'], 'string'],
             [['title', 'description'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -135,7 +135,7 @@ class Article extends ActiveRecord
      */
     public function getComments()
     {
-        return $this->hasMany(Comment::className(), ['article_id' => 'id']);
+        return $this->hasMany(Comment::class, ['article_id' => 'id']);
     }
 
     /**
@@ -143,7 +143,7 @@ class Article extends ActiveRecord
      */
     public function getFavorites()
     {
-        return $this->hasMany(Favorite::className(), ['article_id' => 'id']);
+        return $this->hasMany(Favorite::class, ['article_id' => 'id']);
     }
 
     /**
