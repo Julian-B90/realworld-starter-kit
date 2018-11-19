@@ -14,7 +14,7 @@ use yii\filters\auth\AuthMethod;
  * {
  *     return [
  *         'tokenAuth' => [
- *             'class' => \app\auth\HttpTokenAuth::className(),
+ *             'class' => \app\auth\HttpTokenAuth::class,
  *         ],
  *     ];
  * }

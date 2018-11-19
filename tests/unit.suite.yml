@@ -8,4 +8,5 @@ modules:
     enabled:
       - Asserts
       - Yii2:
-            part: [orm, email]
+            part: [orm, email, fixtures]
+            transaction: true

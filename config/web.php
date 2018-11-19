@@ -1,5 +1,8 @@
 <?php
 
+use app\components\ErrorHandler;
+use app\modules\api\models\User;
+
 $params = require(__DIR__ . '/params.php');
 
 $config = [
@@ -14,16 +17,16 @@ $config = [
                 'application/json' => 'yii\web\JsonParser',
             ]
         ],
+        'response' => [
+            'format' => \yii\web\Response::FORMAT_JSON,
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => User::class,
             'enableAutoLogin' => false,
             'enableSession' => false,
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
         ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -48,6 +51,23 @@ $config = [
             'showScriptName' => false,
             'rules' => require(__DIR__ . '/rules.php'),
         ],
+        'formatter' => [
+            'datetimeFormat' => 'php:Y-m-d\TH:i:s.000\Z',
+        ],
+        'jwt' => [
+            'class' => \sizeg\jwt\Jwt::class,
+            'key' => 'secret',
+            'supportedAlgs' => [
+                'HS256' => 'Lcobucci\JWT\Signer\Hmac\Sha256',
+            ]
+        ],
+        'errorHandler' => [
+            'class' => ErrorHandler::class,
+            'errorAction' => '//error/index'
+        ]
+    ],
+    'modules' => [
+        'api' => ['class' => \app\modules\api\Module::class],
     ],
     'params' => $params,
 ];
@@ -58,14 +78,14 @@ if (YII_ENV_DEV) {
     $config['modules']['debug'] = [
         'class' => 'yii\debug\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['127.0.0.*', '172.17.0.*', '::1'],
     ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['127.0.0.*', '::1'],
     ];
 }
 
